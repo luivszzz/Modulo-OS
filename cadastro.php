@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#sun-fill"></use>
           </svg>
-          Light
+          Claro
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>
@@ -189,7 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#moon-stars-fill"></use>
           </svg>
-          Dark
+          Escuro
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>
@@ -201,7 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#circle-half"></use>
           </svg>
-          Auto
+          Automático
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>

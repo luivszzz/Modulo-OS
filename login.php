@@ -65,12 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               exit;
             } else {
               # Se a senha estiver incorreta, mostre uma mensagem de erro
-              $login_err = "O Email ou a senha que você colocou está errado.";
+              $login_err = "Usuário, e-mail ou senha inválidos.";
             }
           }
         } else {
           # Se o usuário não existir, mostre uma mensagem de erro
-          $login_err = "Nome de usuário ou senha inválidos.";
+          $login_err = "Usuário, e-mail ou senha inválidos.";
         }
       } else {
         echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.');" . "</script>";
@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#sun-fill"></use>
           </svg>
-          Light
+          Claro
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>
@@ -153,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#moon-stars-fill"></use>
           </svg>
-          Dark
+          Escuro
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>
@@ -165,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
             <use href="#circle-half"></use>
           </svg>
-          Auto
+          Automático
           <svg class="bi ms-auto d-none" width="1em" height="1em">
             <use href="#check2"></use>
           </svg>
