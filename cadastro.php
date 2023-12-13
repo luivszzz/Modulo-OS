@@ -1,81 +1,118 @@
 <?php
-# Inicialize a sessão
-session_start();
-
-# Verifique se o usuário já está logado. Se sim, redirecione-o para a página inicial
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == TRUE) {
-  echo "<script>" . "window.location.href='./'" . "</script>";
-  exit;
-}
-
-# Incluia a conexão
+# Inclua a conexão
 require_once "./config.php";
 
 # Defina variáveis e inicialize com valores vazios
-$user_login_err = $user_password_err = $login_err = "";
-$user_login = $user_password = "";
+$username_err = $email_err = $password_err = "";
+$username = $email = $password = "";
 
 # Processando dados do formulário quando o formulário é enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (empty(trim($_POST["user_login"]))) {
-    $user_login_err = "Por favor, insira seu nome de usuário ou um ID de e-mail.";
+  # Validar nome de usuário
+  if (empty(trim($_POST["username"]))) {
+    $username_err = "Por favor digite um nome de usuário.";
   } else {
-    $user_login = trim($_POST["user_login"]);
-  }
+    $username = trim($_POST["username"]);
+    if (!ctype_alnum(str_replace(array("@", "-", "_"), "", $username))) {
+      $username_err = "O nome de usuário só pode conter letras, números e símbolos como '@', '_' ou '-'.";
+    } else {
+      # Prepare uma declaração de SELECT
+      $sql = "SELECT id FROM users WHERE username = ?";
 
-  if (empty(trim($_POST["user_password"]))) {
-    $user_password_err = "Por favor, insira sua senha.";
-  } else {
-    $user_password = trim($_POST["user_password"]);
-  }
+      if ($stmt = mysqli_prepare($link, $sql)) {
+        # Vincule variáveis à instrução como parâmetros
+        mysqli_stmt_bind_param($stmt, "s", $param_username);
 
-  # Validar credenciais 
-  if (empty($user_login_err) && empty($user_password_err)) {
-    # Prepare uma declaração de SELECT
-    $sql = "SELECT id, username, password FROM users WHERE username = ? OR email = ?";
+        # Defina os parâmetros
+        $param_username = $username;
 
-    if ($stmt = mysqli_prepare($link, $sql)) {
-      # Vincule variáveis à instrução como parâmetros
-      mysqli_stmt_bind_param($stmt, "ss", $param_user_login, $param_user_login);
+        # Execute a instrução preparada 
+        if (mysqli_stmt_execute($stmt)) {
+          # Guarde o resultado
+          mysqli_stmt_store_result($stmt);
 
-      # Defina os parâmetros
-      $param_user_login = $user_login;
-
-      # Execute a instrução
-      if (mysqli_stmt_execute($stmt)) {
-        # Guarde o resultado
-        mysqli_stmt_store_result($stmt);
-
-        # Verifique se o usuário existe, se sim, verifique a senha
-        if (mysqli_stmt_num_rows($stmt) == 1) {
-          # Vincular valores no resultado a variáveis
-          mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
-
-          if (mysqli_stmt_fetch($stmt)) {
-            # Verifique se a senha está correta
-            if (password_verify($user_password, $hashed_password)) {
-
-              # Verifique se a senha está correta
-              $_SESSION["id"] = $id;
-              $_SESSION["username"] = $username;
-              $_SESSION["loggedin"] = TRUE;
-
-              # Redirecione o usuário para página inicial
-              echo "<script>" . "window.location.href='./'" . "</script>";
-              exit;
-            } else {
-              # Se a senha estiver incorreta, mostre uma mensagem de erro
-              $login_err = "O Email ou a senha que você colocou está errado.";
-            }
+          # Verifique se o nome de usuário já está cadastrado
+          if (mysqli_stmt_num_rows($stmt) == 1) {
+            $username_err = "Este nome de usuário já está cadastrado.";
           }
         } else {
-          # Se o usuário não existir, mostre uma mensagem de erro
-          $login_err = "Nome de usuário ou senha inválidos.";
+          echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.')" . "</script>";
         }
+
+        # Feche a declaração
+        mysqli_stmt_close($stmt);
+      }
+    }
+  }
+
+  # Validar email
+  if (empty(trim($_POST["email"]))) {
+    $email_err = "Por favor insira um endereço de e-mail";
+  } else {
+    $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $email_err = "Por favor insira um endereço de e-mail válido.";
+    } else {
+      # Prepare uma declaração selecionada
+      $sql = "SELECT id FROM users WHERE email = ?";
+
+      if ($stmt = mysqli_prepare($link, $sql)) {
+        # Vincule variáveis à instrução como parâmetros
+        mysqli_stmt_bind_param($stmt, "s", $param_email);
+
+        # Defina os parâmetros
+        $param_email = $email;
+
+        # Execute a instrução preparada
+        if (mysqli_stmt_execute($stmt)) {
+          # Guarde o resultado
+          mysqli_stmt_store_result($stmt);
+
+          # Verifique se o e-mail já está cadastrado
+          if (mysqli_stmt_num_rows($stmt) == 1) {
+            $email_err = "Este e-mail já está cadastrado.";
+          }
+        } else {
+          echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.');" . "</script>";
+        }
+
+        # Fechar declaração
+        mysqli_stmt_close($stmt);
+      }
+    }
+  }
+
+  # Valide a senha
+  if (empty(trim($_POST["password"]))) {
+    $password_err = "Por favor insira uma senha.";
+  } else {
+    $password = trim($_POST["password"]);
+    if (strlen($password) < 8) {
+      $password_err = "A senha deve conter pelo menos 8 ou mais caracteres.";
+    }
+  }
+
+  # Verifique os erros de entrada antes de inserir dados no banco de dados
+  if (empty($username_err) && empty($email_err) && empty($password_err)) {
+    # Prepare uma instrução de insert
+    $sql = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
+
+    if ($stmt = mysqli_prepare($link, $sql)) {
+      # Vincule variáveis à instrução preparada como parâmetros
+      mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_email, $param_password);
+
+      # Defina os parâmetros
+      $param_username = $username;
+      $param_email = $email;
+      $param_password = password_hash($password, PASSWORD_DEFAULT);
+
+      # Execute a instrução preparada
+      if (mysqli_stmt_execute($stmt)) {
+        echo "<script>" . "alert('Cadastro concluído com sucesso. Faça login para continuar.');" . "</script>";
+        echo "<script>" . "window.location.href='./login.php';" . "</script>";
+        exit;
       } else {
         echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.');" . "</script>";
-        echo "<script>" . "window.location.href='./login.php'" . "</script>";
-        exit;
       }
 
       # Feche a declaração
@@ -95,19 +132,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Módulo OS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <link rel="stylesheet" href="./css/main.css">
+  <title>Cadastro - Módulo OS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">  <link rel="stylesheet" href="./css/main.css">
   <link rel="stylesheet" href="./css/main.css">
   <link rel="shortcut icon" href="./img/favicon-16x16.png" type="image/x-icon">
   <script src="./js/color-modes.js"></script>
   <script defer src="./js/script.js"></script>
-
 </head>
 
 <body class="bg-body-tertiary">
-  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+
+
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
     <symbol id="check2" viewBox="0 0 16 16">
       <path
         d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
@@ -174,42 +210,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </ul>
   </div>
 
+
+
   <div class="d-flex flex-column" style="height: 100%;">
-  <?php
-  if (!empty($login_err)) {
-    echo "<div class='alert alert-danger'>" . $login_err . "</div>";
-  }
-  ?>
-  
-  <main class="form-signin align-middle w-100 m-auto border rounded">
+
+  <main class="form-register align-middle w-100 m-auto border rounded">
     <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" novalidate>
-      <h1 class="h1 mb-3 fw-bold">Módulo OS - Login</h1>
-      <p>Por favor, faça o login para continuar</p>
+      <h1 class="h1 mb-3 fw-bold">Módulo OS - Cadastro</h1>
+      <p>Por favor, preencha este formulário para se cadastrar</p>
       <div class="form-floating">
-        <input type="email" class="form-control" id="user_login" name="user_login" placeholder="E-mail ou usuário"
-          value="<?= $user_login; ?>">
-        <label for="user_login">E-mail ou usuário</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="Nome de usuário"
+          value="<?= $username; ?>">
+        <label for="username">Nome de usuário</label>
         <small class="text-danger">
-          <?= $user_login_err; ?>
+          <?= $username_err; ?>
         </small>
       </div>
       <div class="form-floating">
-        <input type="password" class="form-control" id="password" name="user_password" placeholder="Senha"
-          value="<?= $user_password; ?>">
+        <input type="email" class="form-control" id="email" name="email" placeholder="Endereço de e-mail"
+          value="<?= $email; ?>">
+        <label for="email">Endereço de e-mail</label>
+        <small class="text-danger">
+          <?= $email_err; ?>
+        </small>
+      </div>
+      <div class="form-floating">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Senha"
+          value="<?= $password; ?>">
         <label for="password">Senha</label>
         <small class="text-danger">
-          <?= $user_password_err; ?>
+          <?= $password_err; ?>
         </small>
       </div>
-
-      <input type="submit" class="btn btn-primary w-100 mt-3 py-2" name="submit" value="Login">
-      <p class="mb-0 mt-3">Ainda não possui uma conta? <a href="./cadastro.php">Cadastre-se!</a></p>
+      <input type="submit" class="btn btn-primary w-100 mt-3 py-2" name="submit" value="Cadastrar">
+      <p class="mb-0 mt-3">Já possui uma conta? <a href="./login.php">Faça login!</a></p>
     </form>
   </main>
+
 </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 
 </html>
