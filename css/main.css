@@ -33,6 +33,15 @@ body {
   z-index: 2;
 }
 
+.form-os {
+  max-width: 1000px;
+  padding: 1rem;
+}
+
+.form-os .form-floating:focus-within {
+  z-index: 2;
+}
+
 .form-register input[id="username"] {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
@@ -80,4 +89,36 @@ body {
 
 .bd-mode-toggle .dropdown-menu .active .bi {
   display: block !important;
+}
+
+.tbl-container {
+  width: 400px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+
+.bdr {
+  overflow: hidden;
+}
+
+table {
+  border-collapse: collapse;
+}
+table td, table th {
+  border: 1px solid #495057;
+}
+table tr:first-child th {
+  border-top: 0;
+}
+table tr:last-child td {
+  border-bottom: 0;
+}
+table tr td:first-child,
+table tr th:first-child {
+  border-left: 0;
+}
+table tr td:last-child,
+table tr th:last-child {
+  border-right: 0;
 }

@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   # Validar credenciais 
   if (empty($user_login_err) && empty($user_password_err)) {
     # Prepare uma declaração de SELECT
-    $sql = "SELECT id, username, password FROM users WHERE username = ? OR email = ?";
+    $sql = "SELECT userID, username, password FROM users WHERE username = ? OR email = ?";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
       # Vincule variáveis à instrução como parâmetros

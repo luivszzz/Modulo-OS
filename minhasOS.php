@@ -1,4 +1,12 @@
 <?php
+
+# Inclua a conexão
+require_once "./config.php";
+
+
+$username = $email = $password = "";
+
+
 # Inicialize a sessão
 session_start();
 
@@ -25,7 +33,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
 </head>
 
 
-<body onload="" class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
+<body class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
   
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
     <symbol id="check2" viewBox="0 0 16 16">
@@ -94,28 +102,40 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
     </ul>
   </div>
 
-  </div class="align-middle w-100">
-  <?php
-  if (isset($_SESSION["loggedin"]) && $_SESSION["firstRedirect"] === TRUE) {
-    echo'
-    <div class="alert alert-success alert-dismissible" role="alert">
-    Bem-vindo ', $_SESSION['username'],'! Agora você está conectado à sua conta.
-    <button type="button" class="btn- close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    ';
-
-    $_SESSION["firstRedirect"] = FALSE;
-  }
-  ?>
-  <!-- Perfil do usuário -->  
-    <div class="text-center m-auto">
-      <img src="./img/blank-avatar.jpg" class="img-fluid rounded" alt="User avatar" width="180">
-      <h4 class="my-4">Olá, <?= htmlspecialchars($_SESSION["username"]); ?></h4>
-      <a href="./minhasOS.php" class="btn btn-primary">Minhas OS's</a>
-      <a href="./criarOS.php" class="btn btn-primary">Gerar uma OS</a>
-      <a href="./logout.php" class="btn btn-secondary">Deslogar</a>
-    </div>
-</div>
+  <div class="align-middle text-center w-100 pt-3">
+    <h1>Minhas OS's</h1>
+  </div>
+  <div class="tbl-container bdr border rounded align-middle w-50 m-auto">
+    <table frame="void" rules="all" class="table mb-0">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Handle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Jacob</td>
+          <td>Thornton</td>
+          <td>@fat</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td colspan="2">Larry the Bird</td>
+          <td>@twitter</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

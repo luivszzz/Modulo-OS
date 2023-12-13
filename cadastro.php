@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $username_err = "O nome de usuário só pode conter letras, números e símbolos como '@', '_' ou '-'.";
     } else {
       # Prepare uma declaração de SELECT
-      $sql = "SELECT id FROM users WHERE username = ?";
+      $sql = "SELECT userID FROM users WHERE username = ?";
 
       if ($stmt = mysqli_prepare($link, $sql)) {
         # Vincule variáveis à instrução como parâmetros
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $email_err = "Por favor insira um endereço de e-mail válido.";
     } else {
       # Prepare uma declaração selecionada
-      $sql = "SELECT id FROM users WHERE email = ?";
+      $sql = "SELECT userID FROM users WHERE email = ?";
 
       if ($stmt = mysqli_prepare($link, $sql)) {
         # Vincule variáveis à instrução como parâmetros

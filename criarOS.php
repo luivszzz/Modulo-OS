@@ -1,11 +1,6 @@
 <?php
-
 # Inclua a conexão
 require_once "./config.php";
-
-
-$username = $email = $password = "";
-
 
 # Inicialize a sessão
 session_start();
@@ -15,6 +10,91 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
   echo "<script>" . "window.location.href='./login.php';" . "</script>";
   exit;
 }
+# Defina variáveis e inicialize com valores vazios
+$nomeCliente = $cpfCliente = $endereco = $cidade = $cep = $bairro = $infoAdic = $prdtModelo = $prdtDetalhes = $prdtReclam = $servDiag = $servGarant = $valorServ = $valorPeca = "";
+$nomeCliente_err = $cpfCliente_err = $endereco_err = $cidade_err = $cep_err = $bairro_err = "";
+
+
+# Processando dados do formulário quando o formulário é enviado
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+  # Validar nome
+  if (empty(trim($_POST["inputNome"]))) {
+    $nomeCliente_err = "Por favor digite o nome do cliente.";
+  } else {
+    $nomeCliente = trim($_POST["inputNome"]);
+    if (!ctype_alnum(str_replace(array("@", "-", "_"), "", $nomeCliente))) {
+      $nomeCliente_err = "O nome do cliente só pode conter letras, números e símbolos como '@', '_' ou '-'.";
+    }
+  }
+
+  # Validar CPF/CNPJ
+  if (empty(trim($_POST["inputCPNJ"]))) {
+    $cpfCliente_err = "Por favor digite o CPF ou CNPJ do cliente.";
+  } else {
+    $cpfCliente = trim($_POST["inputCPNJ"]);
+  }
+
+  # Validar endereço
+  if (empty(trim($_POST["inputEndereco"]))) {
+    $endereco_err = "Por favor digite o endereço do cliente.";
+  } else {
+    $endereco = trim($_POST["inputEndereco"]);
+  }
+
+  # Validar cidade
+  if (empty(trim($_POST["inputCidade"]))) {
+    $cidade_err = "Por favor digite a cidade do cliente.";
+  } else {
+    $cidade = trim($_POST["inputCidade"]);
+  }
+
+  # Validar CEP
+  if (empty(trim($_POST["inputCep"]))) {
+    $cep_err = "Por favor digite o CEP do cliente.";
+  } else {
+    $cep = trim($_POST["inputCep"]);
+  }
+
+  # Validar bairro
+  if (empty(trim($_POST["inputBairro"]))) {
+    $bairro_err = "Por favor digite o bairro do cliente.";
+  } else {
+    $bairro = trim($_POST["inputBairro"]);
+  }
+
+  # Verifique os erros de entrada antes de inserir dados no banco de dados
+  if (empty($nomeCliente_err) && empty($cpfCliente_err) && empty($endereco_err) && empty($cidade_err) && empty($cep_err) && empty($bairro_err)) {
+    # Prepare uma instrução de insert
+    $sql = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
+
+    if ($stmt = mysqli_prepare($link, $sql)) {
+      # Vincule variáveis à instrução preparada como parâmetros
+      mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_email, $param_password);
+
+      # Defina os parâmetros
+      $param_username = $username;
+      $param_email = $email;
+      $param_password = password_hash($password, PASSWORD_DEFAULT);
+
+      # Execute a instrução preparada
+      if (mysqli_stmt_execute($stmt)) {
+        echo "<script>" . "alert('Cadastro concluído com sucesso. Faça login para continuar.');" . "</script>";
+        echo "<script>" . "window.location.href='./login.php';" . "</script>";
+        exit;
+      } else {
+        echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.');" . "</script>";
+      }
+
+      # Feche a declaração
+      mysqli_stmt_close($stmt);
+    }
+  }
+
+  # Feche a conexão
+  mysqli_close($link);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -104,102 +184,84 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
 
 
   
-  <div class="align-middle text-center w-100">
-    <div class="m-auto my-3">
-      <img src="./img/blank-avatar.jpg" class="img-fluid rounded" alt="User avatar" width="180">
-      <h4 class="my-4">Olá, <?= htmlspecialchars($_SESSION["username"]); ?></h4>
-      <a href="./index.php" class="btn btn-primary">Voltar</a>
-    </div>
-      <h1>Preencher OS</h1>
-</div>
-  <main class="form-register align-middle w-100 m-auto border rounded">
-  <form class="row g-3">
+  <div class="align-middle text-center w-100 pt-3">
+    <h1>Preencher OS</h1>
+  </div>
+  <main class="form-os align-middle w-100 m-auto border rounded">
+  <form class="row g-3" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" novalidate>
   <div class="col-12">
     <h1>Dados do cliente</h1>
   </div>
   <div class="col-md-6">
-    <label for="inputEmail4" class="form-label">Email</label>
-    <input type="email" class="form-control" id="inputEmail4">
+    <label for="inputNome" class="form-label">Nome</label>
+    <input type="text" class="form-control" id="inputNome" value="<?= $nomeCliente; ?>">
   </div>
   <div class="col-md-6">
-    <label for="inputPassword4" class="form-label">Password</label>
-    <input type="password" class="form-control" id="inputPassword4">
+    <label for="inputCPNJ" class="form-label">CPF/CPNJ</label>
+    <input type="text" class="form-control" id="inputCPNJ" value="<?= $cpfCliente; ?>">
   </div>
   <div class="col-12">
-    <label for="inputAddress" class="form-label">Address</label>
-    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-  </div>
-  <div class="col-12">
-    <label for="inputAddress2" class="form-label">Address 2</label>
-    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-  </div>
-  <div class="col-md-6">
-    <label for="inputCity" class="form-label">City</label>
-    <input type="text" class="form-control" id="inputCity">
+    <label for="inputEndereco" class="form-label">Endereço</label>
+    <input type="text" class="form-control" id="inputEndereco" placeholder="Rua 1, nº 234" value="<?= $endereco; ?>">
   </div>
   <div class="col-md-4">
-    <label for="inputState" class="form-label">State</label>
-    <select id="inputState" class="form-select">
-      <option selected>Choose...</option>
-      <option>...</option>
-    </select>
-  </div>
-  <div class="col-md-2">
-    <label for="inputZip" class="form-label">Zip</label>
-    <input type="text" class="form-control" id="inputZip">
-  </div>
-  <div class="col-12">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="gridCheck">
-      <label class="form-check-label" for="gridCheck">
-        Check me out
-      </label>
-    </div>
-  </div>
-  <div class="col-12 border-top">
-    <h1>Dados do cliente</h1>
-  </div>
-  <div class="col-md-6">
-    <label for="inputEmail4" class="form-label">Email</label>
-    <input type="email" class="form-control" id="inputEmail4">
-  </div>
-  <div class="col-md-6">
-    <label for="inputPassword4" class="form-label">Password</label>
-    <input type="password" class="form-control" id="inputPassword4">
-  </div>
-  <div class="col-12">
-    <label for="inputAddress" class="form-label">Address</label>
-    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-  </div>
-  <div class="col-12">
-    <label for="inputAddress2" class="form-label">Address 2</label>
-    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-  </div>
-  <div class="col-md-6">
-    <label for="inputCity" class="form-label">City</label>
-    <input type="text" class="form-control" id="inputCity">
+    <label for="inputCidade" class="form-label">Cidade</label>
+    <input type="text" class="form-control" id="inputCidade" value="<?= $cidade; ?>">
   </div>
   <div class="col-md-4">
-    <label for="inputState" class="form-label">State</label>
-    <select id="inputState" class="form-select">
-      <option selected>Choose...</option>
-      <option>...</option>
-    </select>
+    <label for="inputCep" class="form-label">CEP</label>
+    <input type="text" class="form-control" id="inputCep" value="<?= $cep; ?>">
   </div>
-  <div class="col-md-2">
-    <label for="inputZip" class="form-label">Zip</label>
-    <input type="text" class="form-control" id="inputZip">
+  <div class="col-md-4">
+    <label for="inputBairro" class="form-label">Bairro</label>
+    <input type="text" class="form-control" id="inputBairro" value="<?= $bairro; ?>">
   </div>
   <div class="col-12">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="gridCheck">
-      <label class="form-check-label" for="gridCheck">
-        Check me out
-      </label>
-    </div>
+    <label for="textEndAdic" class="form-label">Informações adicionais</label>
+    <textarea class="form-control" id="textEndAdic" rows="3" value="<?= $infoAdic; ?>"></textarea>
   </div>
-  <div class="col-12 text-center">
+  <div class="col-12 border-top pt-3">
+    <h1>Informações do produto</h1>
+  </div>
+  <div class="col-12">
+    <label for="inputModelo" class="form-label">Modelo</label>
+    <input type="text" class="form-control" id="inputModelo" value="<?= $prdtModelo; ?>">
+  </div>
+  <div class="col-12">
+    <label for="inputDetalhes" class="form-label">Detalhes</label>
+    <input type="text" class="form-control" id="inputDetalhes" value="<?= $prdtDetalhes; ?>">
+  </div>
+  <div class="col-12">
+    <label for="textReclamacao" class="form-label">Reclamação do cliente</label>
+    <textarea class="form-control" id="textReclamacao" rows="3" value="<?= $prdtReclam; ?>"></textarea>
+  </div>
+  <div class="col-12 border-top pt-3">
+    <h1>Serviço</h1>
+  </div>
+  <div class="col-12">
+    <label for="textDiagnostico" class="form-label">Diagnóstico e serviço a ser executado</label>
+    <textarea class="form-control" id="textDiagnostico" rows="3" value="<?= $servDiag; ?>"></textarea>
+  </div>
+  <div class="col-12">
+    <label for="textGarantia" class="form-label">Garantia e outras observações</label>
+    <textarea class="form-control" id="textGarantia" rows="3" value="<?= $servGarant; ?>"></textarea>
+  </div>
+  <div class="col-12 border-top pt-3">
+    <h1>Valores</h1>
+  </div>
+  <div class="col-md-6">
+    <label for="inputValor" class="form-label">Valor dos serviços</label>
+    <input type="number" class="form-control" id="inputValor" value="<?= $valorServ; ?>">
+  </div>
+  <div class="col-md-6">
+    <label for="inputValor2" class="form-label">Valor de peças/produtos</label>
+    <input type="number" class="form-control" id="inputValor2" value="<?= $valorPeca; ?>">
+  </div>
+  <div class="col-10 text-center">
     <button type="submit" class="btn btn-primary w-100">Gerar OS</button>
+  </div>
+  <div class="col-2 text-center">
+    <a type="submit" href="./index.php" class="btn btn-secondary w-100">Voltar</a>
   </div>
 </form>
   </main>
