@@ -55,10 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             # Verifique se a senha está correta
             if (password_verify($user_password, $hashed_password)) {
 
-              # Verifique se a senha está correta
               $_SESSION["id"] = $id;
               $_SESSION["username"] = $username;
               $_SESSION["loggedin"] = TRUE;
+              $_SESSION["firstRedirect"] = TRUE;
 
               # Redirecione o usuário para página inicial
               echo "<script>" . "window.location.href='./'" . "</script>";

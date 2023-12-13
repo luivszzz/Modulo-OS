@@ -1,4 +1,12 @@
 <?php
+
+# Inclua a conexão
+require_once "./config.php";
+
+
+$username = $email = $password = "";
+
+
 # Inicialize a sessão
 session_start();
 
@@ -25,7 +33,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
 </head>
 
 
-<body onload="" class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
+<body class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
   
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
     <symbol id="check2" viewBox="0 0 16 16">
@@ -94,27 +102,107 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
     </ul>
   </div>
 
-  </div class="align-middle w-100">
-  <?php
-  if (isset($_SESSION["loggedin"]) && $_SESSION["firstRedirect"] === TRUE) {
-    echo'
-    <div class="alert alert-success alert-dismissible" role="alert">
-    Bem-vindo ', $_SESSION['username'],'! Agora você está conectado à sua conta.
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    ';
 
-    $_SESSION["firstRedirect"] = FALSE;
-  }
-  ?>
-  <!-- Perfil do usuário -->  
-    <div class="text-center m-auto">
+  
+  <div class="align-middle text-center w-100">
+    <div class="m-auto my-3">
       <img src="./img/blank-avatar.jpg" class="img-fluid rounded" alt="User avatar" width="180">
       <h4 class="my-4">Olá, <?= htmlspecialchars($_SESSION["username"]); ?></h4>
-      <a href="./logout.php" class="btn btn-primary">Deslogar</a>
-      <a href="./criarOS.php" class="btn btn-primary">Gerar uma OS</a>
+      <a href="./index.php" class="btn btn-primary">Voltar</a>
     </div>
+      <h1>Preencher OS</h1>
 </div>
+  <main class="form-register align-middle w-100 m-auto border rounded">
+  <form class="row g-3">
+  <div class="col-12">
+    <h1>Dados do cliente</h1>
+  </div>
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Email</label>
+    <input type="email" class="form-control" id="inputEmail4">
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Password</label>
+    <input type="password" class="form-control" id="inputPassword4">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress" class="form-label">Address</label>
+    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress2" class="form-label">Address 2</label>
+    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+  </div>
+  <div class="col-md-6">
+    <label for="inputCity" class="form-label">City</label>
+    <input type="text" class="form-control" id="inputCity">
+  </div>
+  <div class="col-md-4">
+    <label for="inputState" class="form-label">State</label>
+    <select id="inputState" class="form-select">
+      <option selected>Choose...</option>
+      <option>...</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label for="inputZip" class="form-label">Zip</label>
+    <input type="text" class="form-control" id="inputZip">
+  </div>
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="gridCheck">
+      <label class="form-check-label" for="gridCheck">
+        Check me out
+      </label>
+    </div>
+  </div>
+  <div class="col-12 border-top">
+    <h1>Dados do cliente</h1>
+  </div>
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Email</label>
+    <input type="email" class="form-control" id="inputEmail4">
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Password</label>
+    <input type="password" class="form-control" id="inputPassword4">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress" class="form-label">Address</label>
+    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress2" class="form-label">Address 2</label>
+    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+  </div>
+  <div class="col-md-6">
+    <label for="inputCity" class="form-label">City</label>
+    <input type="text" class="form-control" id="inputCity">
+  </div>
+  <div class="col-md-4">
+    <label for="inputState" class="form-label">State</label>
+    <select id="inputState" class="form-select">
+      <option selected>Choose...</option>
+      <option>...</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label for="inputZip" class="form-label">Zip</label>
+    <input type="text" class="form-control" id="inputZip">
+  </div>
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="gridCheck">
+      <label class="form-check-label" for="gridCheck">
+        Check me out
+      </label>
+    </div>
+  </div>
+  <div class="col-12 text-center">
+    <button type="submit" class="btn btn-primary w-100">Gerar OS</button>
+  </div>
+</form>
+  </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
