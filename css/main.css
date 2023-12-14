@@ -91,6 +91,10 @@ body {
   display: block !important;
 }
 
+.bd-mode-toggle a{
+  display: block !important;
+}
+
 .tbl-container {
   width: 400px;
   margin-top: 10px;

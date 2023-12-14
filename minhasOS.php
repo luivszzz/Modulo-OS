@@ -24,7 +24,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Página Inicial - Módulo OS</title>
+  <title>Página Inicial - João Manutenção</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/main.css">
   <script src="./js/color-modes.js"></script>
@@ -54,6 +54,11 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
         d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
     </symbol>
   </svg>
+  
+  <div class="position-fixed bottom-0 end-1 mb-3 ms-3 bd-mode-toggle">
+    <a type="submit" href="./index.php" class="btn btn-secondary w-100 d-flex align-items-center">Voltar</a>
+  </div>
+
   <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
     <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
       aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
@@ -104,35 +109,82 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
 
   <div class="align-middle text-center w-100 pt-3">
     <h1>Minhas OS's</h1>
+  <a href="./criarOS.php" class="btn btn-primary">Criar uma nova OS</a>
   </div>
-  <div class="tbl-container bdr border rounded align-middle w-50 m-auto">
-    <table frame="void" rules="all" class="table mb-0">
+
+
+
+
+  <div class="tbl-container bdr border rounded w-auto align-middle m-auto">
+    <table frame="void" rules="all" class="table mb-0 text-center align-middle">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Handle</th>
+          <th scope="col">Nome</th>
+          <th scope="col">CPF</th>
+          <th scope="col">Endereço</th>
+          <th scope="col">Cidade</th>
+          <th scope="col">CEP</th>
+          <th scope="col">Bairro</th>
+          <th scope="col">Informações adicionais</th>
+          <th scope="col">Modelo do produto</th>
+          <th scope="col">Detalhes do produto</th>
+          <th scope="col">Reclamação do cliente</th>
+          <th scope="col">Diagnóstico e serviço a serem executados</th>
+          <th scope="col">Garantia e outras observações</th>
+          <th scope="col">Valor dos serviços</th>
+          <th scope="col">Valor de peças/produtos</th>
+          <th scope="col">Valor total</th>
+          <th scope="col">Estado da OS</th>
+          <th scope="col">Ação</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Mark</td>
-          <td>Otto</td>
-          <td>@mdo</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Jacob</td>
-          <td>Thornton</td>
-          <td>@fat</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td colspan="2">Larry the Bird</td>
-          <td>@twitter</td>
-        </tr>
+        
+        <?php
+          //Ler OS's do usuário logado
+          $stmt = mysqli_prepare($link, "SELECT * FROM orders WHERE `userID`=?;");
+          mysqli_stmt_bind_param($stmt, 'i', $_SESSION["id"]);
+          $stmt->execute();
+          $result = $stmt->get_result();
+          if(mysqli_num_rows($result) >=1){
+            $tmpCount = 0;
+            while($row = $result->fetch_assoc()){
+              $tmpCount++;
+              echo"
+                <tr>
+                  <th scope='row'>$tmpCount</th>
+                  <td>$row[nomeCliente]</td>
+                  <td>$row[cpfCliente]</td>
+                  <td>$row[endereco]</td>
+                  <td>$row[cidade]</td>
+                  <td>$row[cep]</td>
+                  <td>$row[bairro]</td>
+                  <td>$row[infoAdic]</td>
+                  <td>$row[prdtModelo]</td>
+                  <td>$row[prdtDetalhes]</td>
+                  <td>$row[prdtReclam]</td>
+                  <td>$row[servDiag]</td>
+                  <td>$row[servGarant]</td>
+                  <td>$row[valorServ]</td>
+                  <td>$row[valorPeca]</td>
+                  <td>".$row["valorServ"]+$row["valorPeca"]."</td>
+                  <td>$row[orderEstado]</td>
+                  <td>
+                    <a href='./verOS.php?id=$row[orderID]' class='btn btn-primary btn-sm'>Ver</a>
+                    <a href='./editarOS.php?id=$row[orderID]' class='btn btn-warning btn-sm'>Editar</a>
+                    <a href='./deletarOS.php?id=$row[orderID]' class='btn btn-danger btn-sm'>Excluir</a>
+                  </td>
+                </tr>
+              ";
+            }
+          }
+          else{
+            echo"<tr>
+              <td colspan='18'>Você não possui OS's registradas.</td>
+            </tr>";
+          }
+        ?>
       </tbody>
     </table>
   </div>

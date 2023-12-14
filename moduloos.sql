@@ -1,3 +1,7 @@
+CREATE DATABASE joaomanutencao;
+
+USE joaomanutencao;
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 
@@ -25,6 +29,7 @@ CREATE TABLE `orders` (
   `servGarant` text,
   `valorServ` int(10),
   `valorPeca` int(10),
+  `orderEstado` varchar(15),
   `userID` int(11) NOT NULL,
   `reg_date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -33,13 +38,13 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`orderID`);
 
 ALTER TABLE `orders`
-  MODIFY `orderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `orderID` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `orders`
   ADD FOREIGN KEY (`userID`) REFERENCES `users`(`userID`);

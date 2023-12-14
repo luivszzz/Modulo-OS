@@ -1,113 +1,124 @@
 <?php
-# Inclua a conexão
-require_once "./config.php";
+  # Inclua a conexão
+  require_once "./config.php";
 
-# Inicialize a sessão
-session_start();
+  # Inicialize a sessão
+  session_start();
 
-# Se o usuário não estiver logado, redirecione-o para a página de login
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
+  # Se o usuário não estiver logado, redirecione-o para a página de login
+  if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
   echo "<script>" . "window.location.href='./login.php';" . "</script>";
   exit;
-}
-# Defina variáveis e inicialize com valores vazios
-$nomeCliente = $cpfCliente = $endereco = $cidade = $cep = $bairro = $infoAdic = $prdtModelo = $prdtDetalhes = $prdtReclam = $servDiag = $servGarant = $valorServ = $valorPeca = "";
-$nomeCliente_err = $cpfCliente_err = $endereco_err = $cidade_err = $cep_err = $bairro_err = "";
+  }
+  # Defina variáveis e inicialize com valores vazios
+  $nomeCliente = $cpfCliente = $endereco = $cidade = $cep = $bairro = $infoAdic = $prdtModelo = $prdtDetalhes = $prdtReclam = $servDiag = $servGarant = $valorServ = $valorPeca = $estadoOS = "";
+  $nomeCliente_err = $cpfCliente_err = $endereco_err = $cidade_err = $cep_err = $bairro_err = "";
 
 
-# Processando dados do formulário quando o formulário é enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-  # Validar nome
-  if (empty(trim($_POST["inputNome"]))) {
-    $nomeCliente_err = "Por favor digite o nome do cliente.";
-  } else {
-    $nomeCliente = trim($_POST["inputNome"]);
-    if (!ctype_alnum(str_replace(array("@", "-", "_"), "", $nomeCliente))) {
-      $nomeCliente_err = "O nome do cliente só pode conter letras, números e símbolos como '@', '_' ou '-'.";
+  if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    //Ler OS's do usuário logado
+    if(!isset($_GET["id"])){
+      header("location: ./minhasOS.php");
+      exit;
     }
+    $id = $_GET["id"];
+
+    $sql = "SELECT * FROM orders WHERE `orderID`=$id";
+    $result = $connection->query($sql);
+    $row = $result->fetch_assoc();
+
+    if(!$row){
+      header("location: ./minhasOS.php");
+      exit;
+    }
+
+    $nomeCliente = $row["nomeCliente"];
+    $cpfCliente = $row["cpfCliente"];
+    $endereco = $row["endereco"];
+    $cidade = $row["cidade"];
+    $cep = $row["cep"];
+    $bairro = $row["bairro"];
+    $infoAdic = $row["infoAdic"];
+    $prdtModelo = $row["prdtModelo"];
+    $prdtDetalhes = $row["prdtDetalhes"];
+    $prdtReclam = $row["prdtReclam"];
+    $servDiag = $row["servDiag"];
+    $servGarant = $row["servGarant"];
+    $valorServ = $row["valorServ"];
+    $valorPeca = $row["valorPeca"];
+    $estadoOS = $row["orderEstado"];
   }
+  else{
+    $userID = $_SESSION["id"];
+    $id = $_POST["id"];
+    $nomeCliente = $_POST["inputNome"];
+    $cpfCliente = $_POST["inputCPNJ"];
+    $endereco = $_POST["inputEndereco"];
+    $cidade = $_POST["inputCidade"];
+    $cep = $_POST["inputCep"];
+    $bairro = $_POST["inputBairro"];
+    $infoAdic = $_POST["textEndAdic"];
+    $prdtModelo = $_POST["inputModelo"];
+    $prdtDetalhes = $_POST["inputDetalhes"];
+    $prdtReclam = $_POST["textReclamacao"];
+    $servDiag = $_POST["textDiagnostico"];
+    $servGarant = $_POST["textGarantia"];
+    $valorServ = $_POST["inputValor"];
+    $valorPeca = $_POST["inputValor2"];
+    $estadoOS = $_POST["estadoOS"];
 
-  # Validar CPF/CNPJ
-  if (empty(trim($_POST["inputCPNJ"]))) {
-    $cpfCliente_err = "Por favor digite o CPF ou CNPJ do cliente.";
-  } else {
-    $cpfCliente = trim($_POST["inputCPNJ"]);
-  }
 
-  # Validar endereço
-  if (empty(trim($_POST["inputEndereco"]))) {
-    $endereco_err = "Por favor digite o endereço do cliente.";
-  } else {
-    $endereco = trim($_POST["inputEndereco"]);
-  }
-
-  # Validar cidade
-  if (empty(trim($_POST["inputCidade"]))) {
-    $cidade_err = "Por favor digite a cidade do cliente.";
-  } else {
-    $cidade = trim($_POST["inputCidade"]);
-  }
-
-  # Validar CEP
-  if (empty(trim($_POST["inputCep"]))) {
-    $cep_err = "Por favor digite o CEP do cliente.";
-  } else {
-    $cep = trim($_POST["inputCep"]);
-  }
-
-  # Validar bairro
-  if (empty(trim($_POST["inputBairro"]))) {
-    $bairro_err = "Por favor digite o bairro do cliente.";
-  } else {
-    $bairro = trim($_POST["inputBairro"]);
-  }
-
-  # Verifique os erros de entrada antes de inserir dados no banco de dados
-  if (empty($nomeCliente_err) && empty($cpfCliente_err) && empty($endereco_err) && empty($cidade_err) && empty($cep_err) && empty($bairro_err)) {
-    # Prepare uma instrução de insert
-    $sql = "INSERT INTO orders(nomeCliente, cpfCliente, endereco, cidade, cep, bairro, infoAdic, prdtModelo, prdtDetalhes, prdtReclam, servDiag, servGarant, valorServ, valorPeca, orderEstado, userID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    if ($stmt = mysqli_prepare($link, $sql)) {
-      # Vincule variáveis à instrução preparada como parâmetros
-      mysqli_stmt_bind_param($stmt, "ssssssssssssddsd", $param_nomeCliente, $param_cpfCliente, $param_endereco, $param_cidade, $param_cep, $param_bairro, $param_infoAdic, $param_prdtModelo, $param_prdtDetalhes, $param_prdtReclam, $param_servDiag, $param_servGarant, $param_valorServ, $param_valorPeca, $param_orderEstado, $param_userID);
-
-      # Defina os parâmetros
-      $param_nomeCliente = trim($_POST["inputNome"]);
-      $param_cpfCliente = trim($_POST["inputCPNJ"]);
-      $param_endereco = trim($_POST["inputEndereco"]);
-      $param_cidade = trim($_POST["inputCidade"]);
-      $param_cep = trim($_POST["inputCep"]);
-      $param_bairro = trim($_POST["inputBairro"]);
-      $param_infoAdic = trim($_POST["textEndAdic"]);
-      $param_prdtModelo = trim($_POST["inputModelo"]);
-      $param_prdtDetalhes = trim($_POST["inputDetalhes"]);
-      $param_prdtReclam = trim($_POST["textReclamacao"]);
-      $param_servDiag = trim($_POST["textDiagnostico"]);
-      $param_servGarant = trim($_POST["textGarantia"]);
-      $param_valorServ = trim($_POST["inputValor"]);
-      $param_valorPeca = trim($_POST["inputValor2"]);
-      $param_orderEstado = "Em aberto";
-      $param_userID = $_SESSION["id"];
-
-      # Execute a instrução preparada
-      if (mysqli_stmt_execute($stmt)) {
-        echo "<script>" . "alert('OS cadastrada com sucesso!');" . "</script>";
-        echo "<script>" . "window.location.href='./index.php';" . "</script>";
-        exit;
-      } else {
-        echo "<script>" . "alert('Ops! Algo deu errado. Por favor, tente novamente mais tarde.');" . "</script>";
+    do{
+      # Validar nome
+      if (empty($nomeCliente)) {
+      $nomeCliente_err = "Por favor digite o nome do cliente.";
+      }
+      
+      # Validar CPF/CNPJ
+      if (empty($cpfCliente)) {
+        $cpfCliente_err = "Por favor digite o CPF ou CNPJ do cliente.";
       }
 
-      # Feche a declaração
-      mysqli_stmt_close($stmt);
-    }
+      # Validar endereço
+      if (empty($endereco)) {
+        $endereco_err = "Por favor digite o endereço do cliente.";
+      }
+
+      # Validar cidade
+      if (empty($cidade)) {
+        $cidade_err = "Por favor digite a cidade do cliente.";
+      }
+
+      # Validar CEP
+      if (empty($cep)) {
+        $cep_err = "Por favor digite o CEP do cliente.";
+      }
+      # Validar bairro
+      if (empty($bairro)) {
+        $bairro_err = "Por favor digite o bairro do cliente.";
+      }
+
+      # Verifique os erros de entrada antes de inserir dados no banco de dados
+      if (empty($nomeCliente_err) && empty($cpfCliente_err) && empty($endereco_err) && empty($cidade_err) && empty($cep_err) && empty($bairro_err)) {
+        # Prepare uma instrução de insert
+        $sql = "UPDATE orders " .
+        "SET nomeCliente = '$nomeCliente', cpfCliente = '$cpfCliente', endereco = '$endereco', cidade = '$cidade', cep = '$cep', bairro = '$bairro', infoAdic = '$infoAdic', prdtModelo = '$prdtModelo', prdtDetalhes = '$prdtDetalhes', prdtReclam = '$prdtReclam', servDiag = '$servDiag', servGarant = '$servGarant', valorServ = '$valorServ', valorPeca = '$valorPeca', orderEstado = '$estadoOS', userID = '$userID' ".
+        "WHERE orderID = $id";
+
+        $result = $connection->query($sql);
+        print($result);
+        if (!$result) {
+          $errorMessage = "Invalid query: " . $connection->error;
+          break;
+        }
+        $succesMessage = "Client updated correctly";
+
+        header("location: ./minhasOS.php");
+        exit;
+      }
+    } while (false);
   }
-
-  # Feche a conexão
-  mysqli_close($link);
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -150,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   
   <div class="position-fixed bottom-0 end-1 mb-3 ms-3 bd-mode-toggle">
-    <a type="submit" href="./index.php" class="btn btn-secondary w-100 d-flex align-items-center">Voltar</a>
+    <a type="submit" href="./minhasOS.php" class="btn btn-secondary w-100 d-flex align-items-center">Voltar</a>
   </div>
 
   <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
@@ -204,15 +215,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   
   <div class="align-middle text-center w-100 pt-3">
-    <h1>Preencher OS</h1>
+    <h1>Editar OS</h1>
   </div>
   <main class="form-os align-middle w-100 m-auto border rounded">
-  <form class="row g-3" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" novalidate>
+  <form class="row g-3" method="post" novalidate>
   <div class="col-12">
     <h1>Dados do cliente</h1>
   </div>
   <div class="col-md-6">
     <label for="inputNome" class="form-label">Nome</label>
+    <input type="hidden" name="id" value="<?php echo $id; ?>">
     <input type="text" class="form-control" id="inputNome" name="inputNome" value="<?= $nomeCliente; ?>">
     <small class="text-danger">
       <?= $nomeCliente_err; ?>
@@ -255,7 +267,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
   <div class="col-12">
     <label for="textEndAdic" class="form-label">Informações adicionais</label>
-    <textarea class="form-control" id="textEndAdic" name="textEndAdic" rows="3" value="<?= $infoAdic; ?>"></textarea>
+    <textarea class="form-control" id="textEndAdic" name="textEndAdic" rows="3"><?= $infoAdic; ?></textarea>
   </div>
   <div class="col-12 border-top pt-3">
     <h1>Informações do produto</h1>
@@ -270,18 +282,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
   <div class="col-12">
     <label for="textReclamacao" class="form-label">Reclamação do cliente</label>
-    <textarea class="form-control" id="textReclamacao" name="textReclamacao" rows="3" value="<?= $prdtReclam; ?>"></textarea>
+    <textarea class="form-control" id="textReclamacao" name="textReclamacao" rows="3"><?= $prdtReclam; ?></textarea>
   </div>
   <div class="col-12 border-top pt-3">
     <h1>Serviço</h1>
   </div>
   <div class="col-12">
+    <label for="estadoOS" class="form-label">Estado da OS</label>
+    <input type="text" class="form-control" id="estadoOS" name="estadoOS" rows="3" value="<?= $estadoOS; ?>">
+  </div>
+  <div class="col-12">
     <label for="textDiagnostico" class="form-label">Diagnóstico e serviço a ser executado</label>
-    <textarea class="form-control" id="textDiagnostico" name="textDiagnostico" rows="3" value="<?= $servDiag; ?>"></textarea>
+    <textarea class="form-control" id="textDiagnostico" name="textDiagnostico" rows="3"><?= $servDiag; ?></textarea>
   </div>
   <div class="col-12">
     <label for="textGarantia" class="form-label">Garantia e outras observações</label>
-    <textarea class="form-control" id="textGarantia" name="textGarantia" rows="3" value="<?= $servGarant; ?>"></textarea>
+    <textarea class="form-control" id="textGarantia" name="textGarantia" rows="3"><?= $servGarant; ?></textarea>
   </div>
   <div class="col-12 border-top pt-3">
     <h1>Valores</h1>
@@ -295,7 +311,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="number" class="form-control" id="inputValor2" name="inputValor2" value="<?= $valorPeca; ?>">
   </div>
   <div class="col-12 text-center">
-    <button type="submit" class="btn btn-primary w-100">Gerar OS</button>
+    <button type="submit" class="btn btn-primary w-100">Editar OS</button>
   </div>
 </form>
   </main>

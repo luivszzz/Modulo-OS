@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Módulo OS</title>
+  <title>Login - João Manutenção</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/main.css">
@@ -183,7 +183,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   
   <main class="form-signin align-middle w-100 m-auto border rounded">
     <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" novalidate>
-      <h1 class="h1 mb-3 fw-bold">Módulo OS - Login</h1>
+      <h1 class="h1 mb-3 fw-bold">
+    <img class="mb-2" src="./img/icon.png" alt="" width="40" height="40"> João Manutenção - Login</h1>
       <p>Por favor, faça o login para continuar</p>
       <div class="form-floating">
         <input type="email" class="form-control" id="user_login" name="user_login" placeholder="E-mail ou usuário"

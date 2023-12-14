@@ -16,7 +16,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Página Inicial - Módulo OS</title>
+  <title>Página Inicial - João Manutenção</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/main.css">
   <script src="./js/color-modes.js"></script>
@@ -25,7 +25,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
 </head>
 
 
-<body onload="" class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
+<body class="bg-body-tertiary d-flex flex-column" style="heigth: 100%;">
   
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
     <symbol id="check2" viewBox="0 0 16 16">
@@ -100,7 +100,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== TRUE) {
     echo'
     <div class="alert alert-success alert-dismissible" role="alert">
     Bem-vindo ', $_SESSION['username'],'! Agora você está conectado à sua conta.
-    <button type="button" class="btn- close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     ';
 
